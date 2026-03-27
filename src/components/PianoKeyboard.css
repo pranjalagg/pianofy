@@ -1,0 +1,25 @@
+.piano-keyboard {
+  position: relative;
+  display: inline-block;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.piano-keyboard__white-keys {
+  display: flex;
+  position: relative;
+}
+
+.piano-keyboard__black-keys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.piano-keyboard__black-keys .piano-key--black {
+  pointer-events: auto;
+}

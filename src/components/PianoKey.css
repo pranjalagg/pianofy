@@ -1,0 +1,107 @@
+.piano-key {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  user-select: none;
+  transition: background-color 0.06s ease, box-shadow 0.06s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.piano-key__labels {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-bottom: 12px;
+  pointer-events: none;
+}
+
+.piano-key__note {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.piano-key__shortcut {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.4;
+  background: rgba(128, 128, 128, 0.15);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* White keys */
+.piano-key--white {
+  width: 56px;
+  height: 200px;
+  background: linear-gradient(to bottom, #f8f8f8, #e8e8e8);
+  border: 1px solid #bbb;
+  border-radius: 0 0 6px 6px;
+  color: #333;
+  z-index: 1;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.piano-key--white:hover {
+  background: linear-gradient(to bottom, #fff, #f0f0f0);
+}
+
+.piano-key--white.piano-key--active {
+  background: linear-gradient(to bottom, #a78bfa, #8b5cf6);
+  border-color: #7c3aed;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 4px 6px rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
+.piano-key--white.piano-key--active .piano-key__note,
+.piano-key--white.piano-key--active .piano-key__shortcut {
+  opacity: 1;
+}
+
+/* Black keys */
+.piano-key--black {
+  width: 36px;
+  height: 130px;
+  background: linear-gradient(to bottom, #333, #111);
+  border: 1px solid #000;
+  border-radius: 0 0 5px 5px;
+  color: #ccc;
+  z-index: 2;
+  position: absolute;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.piano-key--black .piano-key__labels {
+  padding-bottom: 10px;
+}
+
+.piano-key--black .piano-key__note {
+  font-size: 10px;
+  color: #ccc;
+}
+
+.piano-key--black .piano-key__shortcut {
+  font-size: 9px;
+  color: #aaa;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.piano-key--black:hover {
+  background: linear-gradient(to bottom, #444, #222);
+}
+
+.piano-key--black.piano-key--active {
+  background: linear-gradient(to bottom, #7c3aed, #6d28d9);
+  border-color: #5b21b6;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.piano-key--black.piano-key--active .piano-key__note,
+.piano-key--black.piano-key--active .piano-key__shortcut {
+  opacity: 1;
+  color: #fff;
+}
