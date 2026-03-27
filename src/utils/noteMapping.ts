@@ -21,9 +21,12 @@ const CHROMATIC_SCALE: NoteDefinition[] = [
 // Adjacent layout: home row (ASDF) = white keys, QWERTY row = black keys.
 // This keeps both octaves on physically adjacent keys, like a real piano.
 //
-//   Black:  W  E     T  Y  U     O  P     [
-//   White: A  S  D  F  G  H  J  K  L  ;  '
-//   Note:  C  D  E  F  G  A  B  C  D  E  F  ...
+//   Black:  W  E     T  Y  U     O  P     [  ]     \
+//   White: A  S  D  F  G  H  J  K  L  ;  '  Z  X  C
+//   Note:  C  D  E  F  G  A  B  C  D  E  F  G  A  B
+//
+// The last 3 white keys (G5, A5, B5) use Z, X, C on the bottom row since
+// the home row runs out of keys after '.
 //
 // Semitone offset from the starting C of the 2-octave range:
 const KEY_TO_SEMITONE: Record<string, number> = {
@@ -41,15 +44,20 @@ const KEY_TO_SEMITONE: Record<string, number> = {
   't': 6,   // F#
   'y': 8,   // G#
   'u': 10,  // A#
-  // Second octave - white keys (home row continued)
+  // Second octave - white keys (home row continued + bottom row)
   'k': 12,  // C
   'l': 14,  // D
   ';': 16,  // E
   "'": 17,  // F
+  'z': 19,  // G
+  'x': 21,  // A
+  'c': 23,  // B
   // Second octave - black keys (QWERTY row continued)
   'o': 13,  // C#
   'p': 15,  // D#
   '[': 18,  // F#
+  ']': 20,  // G#
+  '\\': 22, // A#
 };
 
 const BASE_MIDI = 60; // C4
