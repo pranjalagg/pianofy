@@ -1,9 +1,10 @@
 import { useCallback, useRef } from 'react';
 import { midiToFrequency } from '../utils/noteMapping';
+import { getVoiceById } from '../utils/voices';
+import type { VoiceConfig } from '../utils/voices';
 
 interface ActiveNote {
-  oscillator1: OscillatorNode;
-  oscillator2: OscillatorNode;
+  oscillators: OscillatorNode[];
   gainNode: GainNode;
 }
 
@@ -11,6 +12,7 @@ export function useAudio() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const activeNotesRef = useRef<Map<number, ActiveNote>>(new Map());
+  const voiceRef = useRef<VoiceConfig>(getVoiceById('grand-piano'));
 
   const ensureContext = useCallback(() => {
     if (!audioContextRef.current) {
@@ -34,40 +36,43 @@ export function useAudio() {
     const { ctx, masterGain } = ensureContext();
     const frequency = midiToFrequency(midi);
     const now = ctx.currentTime;
+    const voice = voiceRef.current;
+    const { envelope } = voice;
 
     const gainNode = ctx.createGain();
     gainNode.gain.setValueAtTime(0, now);
-    // Attack
-    gainNode.gain.linearRampToValueAtTime(0.6, now + 0.01);
-    // Decay to sustain
-    gainNode.gain.exponentialRampToValueAtTime(0.3, now + 0.3);
+    gainNode.gain.linearRampToValueAtTime(0.6, now + envelope.attack);
+    gainNode.gain.exponentialRampToValueAtTime(
+      Math.max(envelope.sustain * 0.6, 0.001),
+      now + envelope.attack + envelope.decay,
+    );
 
-    // Triangle wave for body
-    const osc1 = ctx.createOscillator();
-    osc1.type = 'triangle';
-    osc1.frequency.setValueAtTime(frequency, now);
+    const oscillators: OscillatorNode[] = [];
 
-    // Sine wave one octave up for brightness
-    const osc2 = ctx.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(frequency * 2, now);
+    for (const oscConfig of voice.oscillators) {
+      const osc = ctx.createOscillator();
+      osc.type = oscConfig.type;
+      osc.frequency.setValueAtTime(frequency * oscConfig.ratio, now);
+      if (oscConfig.detune !== 0) {
+        osc.detune.setValueAtTime(oscConfig.detune, now);
+      }
 
-    const osc2Gain = ctx.createGain();
-    osc2Gain.gain.setValueAtTime(0.15, now);
+      if (oscConfig.gain < 1) {
+        const oscGain = ctx.createGain();
+        oscGain.gain.setValueAtTime(oscConfig.gain, now);
+        osc.connect(oscGain);
+        oscGain.connect(gainNode);
+      } else {
+        osc.connect(gainNode);
+      }
 
-    osc1.connect(gainNode);
-    osc2.connect(osc2Gain);
-    osc2Gain.connect(gainNode);
+      osc.start(now);
+      oscillators.push(osc);
+    }
+
     gainNode.connect(masterGain);
 
-    osc1.start(now);
-    osc2.start(now);
-
-    activeNotesRef.current.set(midi, {
-      oscillator1: osc1,
-      oscillator2: osc2,
-      gainNode,
-    });
+    activeNotesRef.current.set(midi, { oscillators, gainNode });
   }, [ensureContext]);
 
   const stopNote = useCallback((midi: number) => {
@@ -76,15 +81,17 @@ export function useAudio() {
 
     const ctx = audioContextRef.current!;
     const now = ctx.currentTime;
-    const { oscillator1, oscillator2, gainNode } = active;
+    const release = voiceRef.current.envelope.release;
+    const { oscillators, gainNode } = active;
 
-    // Release envelope
     gainNode.gain.cancelScheduledValues(now);
     gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + release);
 
-    oscillator1.stop(now + 0.35);
-    oscillator2.stop(now + 0.35);
+    const stopTime = now + release + 0.05;
+    for (const osc of oscillators) {
+      osc.stop(stopTime);
+    }
 
     activeNotesRef.current.delete(midi);
   }, []);
@@ -95,5 +102,9 @@ export function useAudio() {
     }
   }, []);
 
-  return { playNote, stopNote, setVolume };
+  const setVoice = useCallback((voiceId: string) => {
+    voiceRef.current = getVoiceById(voiceId);
+  }, []);
+
+  return { playNote, stopNote, setVolume, setVoice };
 }

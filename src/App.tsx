@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { PianoKeyboard } from './components/PianoKeyboard';
 import { PianoControls } from './components/PianoControls';
 import { useAudio } from './hooks/useAudio';
@@ -9,19 +9,31 @@ function App() {
   const [octaveOffset, setOctaveOffset] = useState(0);
   const [activeNotes, setActiveNotes] = useState<Set<number>>(new Set());
   const [volume, setVolume] = useState(0.5);
-  const { playNote, stopNote, setVolume: setAudioVolume } = useAudio();
+  const [transpose, setTranspose] = useState(0);
+  const [voiceId, setVoiceId] = useState('grand-piano');
+  const { playNote, stopNote, setVolume: setAudioVolume, setVoice } = useAudio();
+
+  // Track which transposed MIDI is playing for each original MIDI so we can
+  // stop the correct note even if transpose changes while a key is held
+  const transposedMapRef = useRef<Map<number, number>>(new Map());
 
   const handleNoteOn = useCallback(
     (midi: number) => {
-      playNote(midi);
+      const transposedMidi = midi + transpose;
+      transposedMapRef.current.set(midi, transposedMidi);
+      playNote(transposedMidi);
       setActiveNotes((prev) => new Set(prev).add(midi));
     },
-    [playNote],
+    [playNote, transpose],
   );
 
   const handleNoteOff = useCallback(
     (midi: number) => {
-      stopNote(midi);
+      const transposedMidi = transposedMapRef.current.get(midi);
+      if (transposedMidi !== undefined) {
+        stopNote(transposedMidi);
+        transposedMapRef.current.delete(midi);
+      }
       setActiveNotes((prev) => {
         const next = new Set(prev);
         next.delete(midi);
@@ -43,6 +55,18 @@ function App() {
     [setAudioVolume],
   );
 
+  const handleTransposeChange = useCallback((value: number) => {
+    setTranspose(Math.max(-6, Math.min(6, value)));
+  }, []);
+
+  const handleVoiceChange = useCallback(
+    (id: string) => {
+      setVoiceId(id);
+      setVoice(id);
+    },
+    [setVoice],
+  );
+
   useKeyboard({
     octaveOffset,
     onNoteOn: handleNoteOn,
@@ -60,8 +84,12 @@ function App() {
       <PianoControls
         octaveOffset={octaveOffset}
         volume={volume}
+        transpose={transpose}
+        voiceId={voiceId}
         onOctaveChange={handleOctaveChange}
         onVolumeChange={handleVolumeChange}
+        onTransposeChange={handleTransposeChange}
+        onVoiceChange={handleVoiceChange}
       />
 
       <PianoKeyboard

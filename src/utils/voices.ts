@@ -1,0 +1,76 @@
+export interface OscillatorConfig {
+  type: OscillatorType;
+  /** Frequency multiplier relative to the base note (1 = unison, 2 = octave up) */
+  ratio: number;
+  /** Detune in cents (100 cents = 1 semitone) */
+  detune: number;
+  /** Gain level for this oscillator (0-1) */
+  gain: number;
+}
+
+export interface EnvelopeConfig {
+  attack: number;
+  decay: number;
+  sustain: number;
+  release: number;
+}
+
+export interface VoiceConfig {
+  id: string;
+  name: string;
+  oscillators: OscillatorConfig[];
+  envelope: EnvelopeConfig;
+}
+
+export const VOICES: VoiceConfig[] = [
+  {
+    id: 'grand-piano',
+    name: 'Grand Piano',
+    oscillators: [
+      { type: 'triangle', ratio: 1, detune: 0, gain: 1.0 },
+      { type: 'sine', ratio: 2, detune: 0, gain: 0.15 },
+    ],
+    envelope: { attack: 0.01, decay: 0.3, sustain: 0.3, release: 0.3 },
+  },
+  {
+    id: 'electric-piano',
+    name: 'Electric Piano',
+    oscillators: [
+      { type: 'sine', ratio: 1, detune: 0, gain: 1.0 },
+      { type: 'sine', ratio: 3, detune: 7, gain: 0.25 },
+      { type: 'sine', ratio: 1, detune: -6, gain: 0.3 },
+    ],
+    envelope: { attack: 0.005, decay: 0.6, sustain: 0.4, release: 0.4 },
+  },
+  {
+    id: 'harmonium',
+    name: 'Harmonium',
+    oscillators: [
+      { type: 'sawtooth', ratio: 1, detune: 0, gain: 0.5 },
+      { type: 'square', ratio: 1, detune: 5, gain: 0.3 },
+      { type: 'sawtooth', ratio: 2, detune: 0, gain: 0.1 },
+    ],
+    envelope: { attack: 0.02, decay: 0.1, sustain: 0.8, release: 0.15 },
+  },
+  {
+    id: 'synth-pad',
+    name: 'Synth Pad',
+    oscillators: [
+      { type: 'sawtooth', ratio: 1, detune: -8, gain: 0.5 },
+      { type: 'sawtooth', ratio: 1, detune: 8, gain: 0.5 },
+    ],
+    envelope: { attack: 0.3, decay: 0.5, sustain: 0.6, release: 0.8 },
+  },
+  {
+    id: 'music-box',
+    name: 'Music Box',
+    oscillators: [
+      { type: 'sine', ratio: 1, detune: 0, gain: 1.0 },
+    ],
+    envelope: { attack: 0.001, decay: 0.15, sustain: 0.05, release: 0.5 },
+  },
+];
+
+export function getVoiceById(id: string): VoiceConfig {
+  return VOICES.find((v) => v.id === id) ?? VOICES[0];
+}
