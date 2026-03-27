@@ -1,56 +1,55 @@
 export interface NoteDefinition {
   note: string;
-  midiNumber: number;
   isBlack: boolean;
 }
 
-// Two octaves starting at C4 (middle C, MIDI 60)
-const BASE_OCTAVE_NOTES: NoteDefinition[] = [
-  { note: 'C',  midiNumber: 0,  isBlack: false },
-  { note: 'C#', midiNumber: 1,  isBlack: true },
-  { note: 'D',  midiNumber: 2,  isBlack: false },
-  { note: 'D#', midiNumber: 3,  isBlack: true },
-  { note: 'E',  midiNumber: 4,  isBlack: false },
-  { note: 'F',  midiNumber: 5,  isBlack: false },
-  { note: 'F#', midiNumber: 6,  isBlack: true },
-  { note: 'G',  midiNumber: 7,  isBlack: false },
-  { note: 'G#', midiNumber: 8,  isBlack: true },
-  { note: 'A',  midiNumber: 9,  isBlack: false },
-  { note: 'A#', midiNumber: 10, isBlack: true },
-  { note: 'B',  midiNumber: 11, isBlack: false },
+const CHROMATIC_SCALE: NoteDefinition[] = [
+  { note: 'C',  isBlack: false },
+  { note: 'C#', isBlack: true },
+  { note: 'D',  isBlack: false },
+  { note: 'D#', isBlack: true },
+  { note: 'E',  isBlack: false },
+  { note: 'F',  isBlack: false },
+  { note: 'F#', isBlack: true },
+  { note: 'G',  isBlack: false },
+  { note: 'G#', isBlack: true },
+  { note: 'A',  isBlack: false },
+  { note: 'A#', isBlack: true },
+  { note: 'B',  isBlack: false },
 ];
 
-// Lower octave: white keys on Z-M row, black keys on A-J row
-// Upper octave: white keys on Q-U row, black keys on 1-7 row
+// Adjacent layout: home row (ASDF) = white keys, QWERTY row = black keys.
+// This keeps both octaves on physically adjacent keys, like a real piano.
+//
+//   Black:  W  E     T  Y  U     O  P     [
+//   White: A  S  D  F  G  H  J  K  L  ;  '
+//   Note:  C  D  E  F  G  A  B  C  D  E  F  ...
+//
+// Semitone offset from the starting C of the 2-octave range:
 const KEY_TO_SEMITONE: Record<string, number> = {
-  // Lower octave - white keys
-  'z': 0,   // C
-  'x': 2,   // D
-  'c': 4,   // E
-  'v': 5,   // F
-  'b': 7,   // G
-  'n': 9,   // A
-  'm': 11,  // B
-  // Lower octave - black keys
-  's': 1,   // C#
-  'd': 3,   // D#
-  'g': 6,   // F#
-  'h': 8,   // G#
-  'j': 10,  // A#
-  // Upper octave - white keys
-  'q': 12,  // C
-  'w': 14,  // D
-  'e': 16,  // E
-  'r': 17,  // F
-  't': 19,  // G
-  'y': 21,  // A
-  'u': 23,  // B
-  // Upper octave - black keys
-  '2': 13,  // C#
-  '3': 15,  // D#
-  '5': 18,  // F#
-  '6': 20,  // G#
-  '7': 22,  // A#
+  // First octave - white keys (home row)
+  'a': 0,   // C
+  's': 2,   // D
+  'd': 4,   // E
+  'f': 5,   // F
+  'g': 7,   // G
+  'h': 9,   // A
+  'j': 11,  // B
+  // First octave - black keys (QWERTY row)
+  'w': 1,   // C#
+  'e': 3,   // D#
+  't': 6,   // F#
+  'y': 8,   // G#
+  'u': 10,  // A#
+  // Second octave - white keys (home row continued)
+  'k': 12,  // C
+  'l': 14,  // D
+  ';': 16,  // E
+  "'": 17,  // F
+  // Second octave - black keys (QWERTY row continued)
+  'o': 13,  // C#
+  'p': 15,  // D#
+  '[': 18,  // F#
 };
 
 const BASE_MIDI = 60; // C4
@@ -65,41 +64,37 @@ export function keyToMidi(key: string, octaveOffset: number): number | null {
   return BASE_MIDI + semitone + octaveOffset * 12;
 }
 
-export function getNoteLabel(midi: number): string {
-  const octave = Math.floor(midi / 12) - 1;
-  const noteIndex = midi % 12;
-  const noteName = BASE_OCTAVE_NOTES[noteIndex].note;
-  return `${noteName}${octave}`;
-}
-
-export function getKeyboardLabel(key: string): string {
-  return key.toUpperCase();
-}
-
 export interface PianoKeyData {
   id: string;
   note: string;
   midiNumber: number;
   isBlack: boolean;
-  keyboardKey: string;
+  keyboardKey: string | null;
   frequency: number;
 }
 
+// Build a reverse lookup: semitone offset → keyboard key
+const SEMITONE_TO_KEY: Record<number, string> = {};
+for (const [key, semitone] of Object.entries(KEY_TO_SEMITONE)) {
+  SEMITONE_TO_KEY[semitone] = key;
+}
+
+const TOTAL_SEMITONES = 24; // 2 full octaves
+
 export function generatePianoKeys(octaveOffset: number): PianoKeyData[] {
   const keys: PianoKeyData[] = [];
-  const entries = Object.entries(KEY_TO_SEMITONE).sort((a, b) => a[1] - b[1]);
 
-  for (const [key, semitone] of entries) {
+  for (let semitone = 0; semitone < TOTAL_SEMITONES; semitone++) {
     const midi = BASE_MIDI + semitone + octaveOffset * 12;
     const noteIndex = midi % 12;
     const octave = Math.floor(midi / 12) - 1;
-    const noteDef = BASE_OCTAVE_NOTES[noteIndex];
+    const noteDef = CHROMATIC_SCALE[noteIndex];
     keys.push({
       id: `${noteDef.note}${octave}`,
       note: `${noteDef.note}${octave}`,
       midiNumber: midi,
       isBlack: noteDef.isBlack,
-      keyboardKey: key,
+      keyboardKey: SEMITONE_TO_KEY[semitone] ?? null,
       frequency: midiToFrequency(midi),
     });
   }

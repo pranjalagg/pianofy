@@ -5,7 +5,7 @@ interface PianoKeyProps {
   note: string;
   isBlack: boolean;
   isActive: boolean;
-  keyboardKey: string;
+  keyboardKey: string | null;
   style?: CSSProperties;
   onPlay: () => void;
   onStop: () => void;
@@ -46,7 +46,9 @@ export function PianoKey({
     >
       <div className="piano-key__labels">
         <span className="piano-key__note">{note}</span>
-        <span className="piano-key__shortcut">{keyboardKey.toUpperCase()}</span>
+        {keyboardKey && (
+          <span className="piano-key__shortcut">{keyboardKey.toUpperCase()}</span>
+        )}
       </div>
     </div>
   );

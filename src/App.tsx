@@ -73,7 +73,7 @@ function App() {
 
       <footer className="app__footer">
         <div className="app__hints">
-          <span><kbd>Z</kbd>–<kbd>M</kbd> &amp; <kbd>Q</kbd>–<kbd>U</kbd> play notes</span>
+          <span><kbd>A</kbd>–<kbd>'</kbd> play white keys &middot; <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> play black keys</span>
           <span><kbd>←</kbd> <kbd>→</kbd> shift octave</span>
         </div>
       </footer>
