@@ -4,9 +4,15 @@ interface PianoControlsProps {
   octaveOffset: number;
   volume: number;
   transpose: number;
+  reverb: number;
+  chorusOn: boolean;
+  delayOn: boolean;
   onOctaveChange: (delta: number) => void;
   onVolumeChange: (volume: number) => void;
   onTransposeChange: (value: number) => void;
+  onReverbChange: (amount: number) => void;
+  onChorusToggle: () => void;
+  onDelayToggle: () => void;
 }
 
 const SEMITONE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -25,9 +31,15 @@ export function PianoControls({
   octaveOffset,
   volume,
   transpose,
+  reverb,
+  chorusOn,
+  delayOn,
   onOctaveChange,
   onVolumeChange,
   onTransposeChange,
+  onReverbChange,
+  onChorusToggle,
+  onDelayToggle,
 }: PianoControlsProps) {
   const currentOctave = 4 + octaveOffset;
 
@@ -94,6 +106,41 @@ export function PianoControls({
           value={volume}
           onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
         />
+      </div>
+
+      <div className="piano-controls__sep" />
+
+      <div className="piano-controls__group">
+        <span className="piano-controls__label">Reverb</span>
+        <input
+          type="range"
+          className="piano-controls__slider"
+          min="0"
+          max="1"
+          step="0.01"
+          value={reverb}
+          onChange={(e) => onReverbChange(parseFloat(e.target.value))}
+        />
+      </div>
+
+      <div className="piano-controls__sep" />
+
+      <div className="piano-controls__group">
+        <span className="piano-controls__label">FX</span>
+        <div className="piano-controls__toggles">
+          <button
+            className={`piano-controls__toggle ${chorusOn ? 'piano-controls__toggle--active' : ''}`}
+            onClick={onChorusToggle}
+          >
+            Chorus
+          </button>
+          <button
+            className={`piano-controls__toggle ${delayOn ? 'piano-controls__toggle--active' : ''}`}
+            onClick={onDelayToggle}
+          >
+            Delay
+          </button>
+        </div>
       </div>
     </div>
   );

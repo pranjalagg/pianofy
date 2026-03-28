@@ -17,19 +17,89 @@ interface ActiveSampleNote {
 
 type ActiveNote = ActiveOscNote | ActiveSampleNote;
 
+function createReverbIR(ctx: AudioContext, duration = 1.5, decay = 2): AudioBuffer {
+  const sampleRate = ctx.sampleRate;
+  const length = sampleRate * duration;
+  const buffer = ctx.createBuffer(2, length, sampleRate);
+  for (let channel = 0; channel < 2; channel++) {
+    const data = buffer.getChannelData(channel);
+    for (let i = 0; i < length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+    }
+  }
+  return buffer;
+}
+
 export function useAudio() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const activeNotesRef = useRef<Map<number, ActiveNote>>(new Map());
   const voiceRef = useRef<VoiceConfig>(getVoiceById('grand-piano'));
   const bufferCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
+  const effectsBusRef = useRef<GainNode | null>(null);
+  const reverbWetRef = useRef<GainNode | null>(null);
+  const chorusWetRef = useRef<GainNode | null>(null);
+  const chorusDelayRef = useRef<DelayNode | null>(null);
+  const chorusLFORef = useRef<OscillatorNode | null>(null);
+  const delayNodeRef = useRef<DelayNode | null>(null);
+  const delayWetRef = useRef<GainNode | null>(null);
+  const delayFeedbackRef = useRef<GainNode | null>(null);
 
   const ensureContext = useCallback(() => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext();
-      masterGainRef.current = audioContextRef.current.createGain();
+      const ctx = new AudioContext();
+      audioContextRef.current = ctx;
+
+      masterGainRef.current = ctx.createGain();
       masterGainRef.current.gain.value = 0.5;
-      masterGainRef.current.connect(audioContextRef.current.destination);
+      masterGainRef.current.connect(ctx.destination);
+
+      const masterGain = masterGainRef.current;
+
+      effectsBusRef.current = ctx.createGain();
+      effectsBusRef.current.connect(masterGain);
+
+      const convolver = ctx.createConvolver();
+      convolver.buffer = createReverbIR(ctx);
+      const reverbWet = ctx.createGain();
+      reverbWet.gain.value = 0.3;
+      effectsBusRef.current.connect(convolver);
+      convolver.connect(reverbWet);
+      reverbWet.connect(masterGain);
+      reverbWetRef.current = reverbWet;
+
+      const chorusDelay = ctx.createDelay();
+      chorusDelay.delayTime.value = 0.015;
+      const chorusLFO = ctx.createOscillator();
+      chorusLFO.frequency.value = 0.5;
+      const chorusDepth = ctx.createGain();
+      chorusDepth.gain.value = 0.002;
+      chorusLFO.connect(chorusDepth);
+      chorusDepth.connect(chorusDelay.delayTime);
+      chorusLFO.start();
+      const chorusWet = ctx.createGain();
+      chorusWet.gain.value = 0.3;
+      effectsBusRef.current.connect(chorusDelay);
+      chorusDelay.connect(chorusWet);
+      chorusWet.connect(masterGain);
+      chorusWetRef.current = chorusWet;
+      chorusDelayRef.current = chorusDelay;
+      chorusLFORef.current = chorusLFO;
+
+      const delayNode = ctx.createDelay();
+      delayNode.delayTime.value = 0.15;
+      const delayFeedback = ctx.createGain();
+      delayFeedback.gain.value = 0.2;
+      const delayWet = ctx.createGain();
+      delayWet.gain.value = 0;
+      effectsBusRef.current.connect(delayNode);
+      delayNode.connect(delayFeedback);
+      delayFeedback.connect(delayNode);
+      delayNode.connect(delayWet);
+      delayWet.connect(masterGain);
+      delayNodeRef.current = delayNode;
+      delayWetRef.current = delayWet;
+      delayFeedbackRef.current = delayFeedback;
     }
     if (audioContextRef.current.state === 'suspended') {
       audioContextRef.current.resume();
@@ -37,6 +107,7 @@ export function useAudio() {
     return {
       ctx: audioContextRef.current,
       masterGain: masterGainRef.current!,
+      effectsBus: effectsBusRef.current!,
     };
   }, []);
 
@@ -60,7 +131,7 @@ export function useAudio() {
   const playNote = useCallback((midi: number) => {
     if (activeNotesRef.current.has(midi)) return;
 
-    const { ctx, masterGain } = ensureContext();
+    const { ctx, effectsBus } = ensureContext();
     const now = ctx.currentTime;
     const voice = voiceRef.current;
     const { envelope } = voice;
@@ -72,7 +143,7 @@ export function useAudio() {
       Math.max(envelope.sustain * 0.6, 0.001),
       now + envelope.attack + envelope.decay,
     );
-    gainNode.connect(masterGain);
+    gainNode.connect(effectsBus);
 
     if (voice.type === 'sample') {
       const buffer = bufferCacheRef.current.get(voice.sampleUrl);
@@ -154,5 +225,23 @@ export function useAudio() {
     }
   }, [loadSample]);
 
-  return { playNote, stopNote, setVolume, setVoice };
+  const setReverb = useCallback((amount: number) => {
+    if (reverbWetRef.current) {
+      reverbWetRef.current.gain.value = amount;
+    }
+  }, []);
+
+  const setChorus = useCallback((enabled: boolean) => {
+    if (chorusWetRef.current) {
+      chorusWetRef.current.gain.value = enabled ? 0.3 : 0;
+    }
+  }, []);
+
+  const setDelay = useCallback((enabled: boolean) => {
+    if (delayWetRef.current) {
+      delayWetRef.current.gain.value = enabled ? 0.15 : 0;
+    }
+  }, []);
+
+  return { playNote, stopNote, setVolume, setVoice, setReverb, setChorus, setDelay };
 }

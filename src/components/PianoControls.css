@@ -116,3 +116,43 @@
   cursor: pointer;
   box-shadow: 0 1px 3px var(--shadow-key);
 }
+
+.piano-controls__toggles {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.piano-controls__toggle {
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-3);
+  padding: 4px 12px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.piano-controls__toggle:last-child {
+  border-right: none;
+}
+
+.piano-controls__toggle:hover {
+  background: var(--surface);
+  color: var(--text-1);
+}
+
+.piano-controls__toggle--active {
+  background: var(--text-1);
+  color: var(--bg);
+}
+
+.piano-controls__toggle--active:hover {
+  background: var(--text-2);
+  color: var(--bg);
+}

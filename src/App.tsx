@@ -13,7 +13,10 @@ function App() {
   const [volume, setVolume] = useState(0.5);
   const [transpose, setTranspose] = useState(0);
   const [voiceId, setVoiceId] = useState('grand-piano');
-  const { playNote, stopNote, setVolume: setAudioVolume, setVoice } = useAudio();
+  const [reverb, setReverb] = useState(0.3);
+  const [chorusOn, setChorusOn] = useState(true);
+  const [delayOn, setDelayOn] = useState(false);
+  const { playNote, stopNote, setVolume: setAudioVolume, setVoice, setReverb: setAudioReverb, setChorus: setAudioChorus, setDelay: setAudioDelay } = useAudio();
   const { theme, toggleTheme } = useTheme();
 
   const transposedMapRef = useRef<Map<number, number>>(new Map());
@@ -60,6 +63,30 @@ function App() {
     setTranspose(Math.max(-6, Math.min(6, value)));
   }, []);
 
+  const handleReverbChange = useCallback(
+    (amount: number) => {
+      setReverb(amount);
+      setAudioReverb(amount);
+    },
+    [setAudioReverb],
+  );
+
+  const handleChorusToggle = useCallback(() => {
+    setChorusOn((prev) => {
+      const next = !prev;
+      setAudioChorus(next);
+      return next;
+    });
+  }, [setAudioChorus]);
+
+  const handleDelayToggle = useCallback(() => {
+    setDelayOn((prev) => {
+      const next = !prev;
+      setAudioDelay(next);
+      return next;
+    });
+  }, [setAudioDelay]);
+
   const handleVoiceChange = useCallback(
     (id: string) => {
       setVoiceId(id);
@@ -95,9 +122,15 @@ function App() {
         octaveOffset={octaveOffset}
         volume={volume}
         transpose={transpose}
+        reverb={reverb}
+        chorusOn={chorusOn}
+        delayOn={delayOn}
         onOctaveChange={handleOctaveChange}
         onVolumeChange={handleVolumeChange}
         onTransposeChange={handleTransposeChange}
+        onReverbChange={handleReverbChange}
+        onChorusToggle={handleChorusToggle}
+        onDelayToggle={handleDelayToggle}
       />
 
       <PianoKeyboard
