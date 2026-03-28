@@ -4,6 +4,7 @@ import { PianoControls } from './components/PianoControls';
 import { VoiceSelector } from './components/VoiceSelector';
 import { useAudio } from './hooks/useAudio';
 import { useKeyboard } from './hooks/useKeyboard';
+import { useTheme } from './hooks/useTheme';
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   const [transpose, setTranspose] = useState(0);
   const [voiceId, setVoiceId] = useState('grand-piano');
   const { playNote, stopNote, setVolume: setAudioVolume, setVoice } = useAudio();
+  const { theme, toggleTheme } = useTheme();
 
   const transposedMapRef = useRef<Map<number, number>>(new Map());
 
@@ -76,7 +78,16 @@ function App() {
   return (
     <div className="app">
       <header className="app__header">
-        <h1 className="app__title">pianofy</h1>
+        <div className="app__title-row">
+          <h1 className="app__title">pianofy</h1>
+          <button
+            className="app__theme-toggle"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? '\u263E' : '\u2600'}
+          </button>
+        </div>
         <p className="app__subtitle">Play with your keyboard</p>
       </header>
 

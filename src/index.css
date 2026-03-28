@@ -6,6 +6,52 @@
   padding: 0;
 }
 
+:root {
+  --bg: #faf9f6;
+  --surface: #f0eee9;
+  --border: #ddd9d1;
+  --border-key: #d4d1cc;
+  --text-1: #1a1a1a;
+  --text-2: #666;
+  --text-3: #999;
+  --text-4: #aaa;
+  --accent: #e8590c;
+  --accent-border: #cf4f0a;
+  --accent-dark: #d4510b;
+  --accent-dark-border: #b8460a;
+  --key-white: #fcfcfa;
+  --key-white-hover: #f7f6f3;
+  --key-black: #1c1c1c;
+  --key-black-hover: #2a2a2a;
+  --key-black-border: #111;
+  --rail: #3a3632;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --shadow-key: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+  --bg: #111110;
+  --surface: #1c1c1a;
+  --border: #2e2e2a;
+  --border-key: #2a2a26;
+  --text-1: #e8e6e1;
+  --text-2: #999;
+  --text-3: #777;
+  --text-4: #666;
+  --accent: #f97316;
+  --accent-border: #ea6a0e;
+  --accent-dark: #e05f0d;
+  --accent-dark-border: #c9540b;
+  --key-white: #d5d3ce;
+  --key-white-hover: #c8c6c1;
+  --key-black: #1a1a1a;
+  --key-black-hover: #252525;
+  --key-black-border: #0e0e0e;
+  --rail: #444;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-key: rgba(0, 0, 0, 0.4);
+}
+
 html, body {
   height: 100%;
 }
@@ -13,8 +59,8 @@ html, body {
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen, Ubuntu, sans-serif;
-  background: #faf9f6;
-  color: #1a1a1a;
+  background: var(--bg);
+  color: var(--text-1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

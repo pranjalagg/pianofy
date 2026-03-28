@@ -3,9 +3,9 @@
   display: inline-block;
   border-radius: 0 0 8px 8px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid #d4d1cc;
-  border-top: 4px solid #3a3632;
+  box-shadow: 0 4px 16px var(--shadow);
+  border: 1px solid var(--border-key);
+  border-top: 4px solid var(--rail);
 }
 
 .piano-keyboard__white-keys {
