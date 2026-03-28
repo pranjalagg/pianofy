@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { midiToFrequency } from '../utils/noteMapping';
-import { getVoiceById } from '../utils/voices';
+import { getVoiceById, findNearestSample } from '../utils/voices';
 import type { VoiceConfig } from '../utils/voices';
 
 interface ActiveOscNote {
@@ -157,6 +157,39 @@ export function useAudio() {
       source.start(now);
 
       activeNotesRef.current.set(midi, { kind: 'sample', source, gainNode });
+    } else if (voice.type === 'multi-sample') {
+      const nearest = findNearestSample(voice.samples, midi);
+      const buffer = bufferCacheRef.current.get(nearest.url);
+      if (buffer) {
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.playbackRate.value = Math.pow(2, (midi - nearest.midi) / 12);
+        source.connect(gainNode);
+        source.start(now);
+        activeNotesRef.current.set(midi, { kind: 'sample', source, gainNode });
+      } else {
+        const frequency = midiToFrequency(midi);
+        const oscillators: OscillatorNode[] = [];
+        for (const oscConfig of voice.fallbackOscillators) {
+          const osc = ctx.createOscillator();
+          osc.type = oscConfig.type;
+          osc.frequency.setValueAtTime(frequency * oscConfig.ratio, now);
+          if (oscConfig.detune !== 0) {
+            osc.detune.setValueAtTime(oscConfig.detune, now);
+          }
+          if (oscConfig.gain < 1) {
+            const oscGain = ctx.createGain();
+            oscGain.gain.setValueAtTime(oscConfig.gain, now);
+            osc.connect(oscGain);
+            oscGain.connect(gainNode);
+          } else {
+            osc.connect(gainNode);
+          }
+          osc.start(now);
+          oscillators.push(osc);
+        }
+        activeNotesRef.current.set(midi, { kind: 'oscillator', oscillators, gainNode });
+      }
     } else {
       const frequency = midiToFrequency(midi);
       const oscillators: OscillatorNode[] = [];
@@ -222,6 +255,10 @@ export function useAudio() {
     voiceRef.current = voice;
     if (voice.type === 'sample') {
       loadSample(voice.sampleUrl);
+    } else if (voice.type === 'multi-sample') {
+      for (const sample of voice.samples) {
+        loadSample(sample.url);
+      }
     }
   }, [loadSample]);
 

@@ -35,14 +35,37 @@ export interface SampleVoice {
   glowIntensity: number;
 }
 
-export type VoiceConfig = OscillatorVoice | SampleVoice;
+export interface SampleEntry {
+  midi: number;
+  url: string;
+}
+
+export interface MultiSampleVoice {
+  id: string;
+  name: string;
+  type: 'multi-sample';
+  samples: SampleEntry[];
+  fallbackOscillators: OscillatorConfig[];
+  envelope: EnvelopeConfig;
+  glowIntensity: number;
+}
+
+export type VoiceConfig = OscillatorVoice | SampleVoice | MultiSampleVoice;
 
 export const VOICES: VoiceConfig[] = [
   {
     id: 'grand-piano',
     name: 'Grand Piano',
-    type: 'oscillator',
-    oscillators: [
+    type: 'multi-sample',
+    samples: [
+      { midi: 36, url: '/samples/piano-c2.mp3' },
+      { midi: 48, url: '/samples/piano-c3.mp3' },
+      { midi: 60, url: '/samples/piano-c4.mp3' },
+      { midi: 72, url: '/samples/piano-c5.mp3' },
+      { midi: 84, url: '/samples/piano-c6.mp3' },
+      { midi: 96, url: '/samples/piano-c7.mp3' },
+    ],
+    fallbackOscillators: [
       { type: 'triangle', ratio: 1, detune: 0, gain: 1.0 },
       { type: 'sine', ratio: 2, detune: 0, gain: 0.15 },
     ],
@@ -96,4 +119,17 @@ export const VOICES: VoiceConfig[] = [
 
 export function getVoiceById(id: string): VoiceConfig {
   return VOICES.find((v) => v.id === id) ?? VOICES[0];
+}
+
+export function findNearestSample(samples: SampleEntry[], midi: number): SampleEntry {
+  let nearest = samples[0];
+  let minDist = Math.abs(midi - nearest.midi);
+  for (let i = 1; i < samples.length; i++) {
+    const dist = Math.abs(midi - samples[i].midi);
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = samples[i];
+    }
+  }
+  return nearest;
 }
