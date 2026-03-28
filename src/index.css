@@ -30,6 +30,10 @@
   --rail: #3a3632;
   --shadow: rgba(0, 0, 0, 0.08);
   --shadow-key: rgba(0, 0, 0, 0.15);
+  --glow-white: rgba(232, 89, 12, 0.4);
+  --glow-black: rgba(212, 81, 11, 0.5);
+  --glow-rail: rgba(232, 89, 12, 0.15);
+  --text-5: #bbb;
 }
 
 [data-theme="dark"] {
@@ -56,6 +60,10 @@
   --rail: #444;
   --shadow: rgba(0, 0, 0, 0.3);
   --shadow-key: rgba(0, 0, 0, 0.4);
+  --glow-white: rgba(249, 115, 22, 0.5);
+  --glow-black: rgba(224, 95, 13, 0.6);
+  --glow-rail: rgba(249, 115, 22, 0.2);
+  --text-5: #666;
 }
 
 html, body {

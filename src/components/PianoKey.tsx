@@ -7,6 +7,7 @@ interface PianoKeyProps {
   isActive: boolean;
   keyboardKey: string | null;
   style?: CSSProperties;
+  glowIntensity?: number;
   onPlay: () => void;
   onStop: () => void;
 }
@@ -17,6 +18,7 @@ export function PianoKey({
   isActive,
   keyboardKey,
   style,
+  glowIntensity,
   onPlay,
   onStop,
 }: PianoKeyProps) {
@@ -28,10 +30,15 @@ export function PianoKey({
     .filter(Boolean)
     .join(' ');
 
+  const mergedStyle: CSSProperties = {
+    ...style,
+    ...(glowIntensity !== undefined ? { '--glow-intensity': glowIntensity } as CSSProperties : {}),
+  };
+
   return (
     <div
       className={className}
-      style={style}
+      style={mergedStyle}
       onMouseDown={onPlay}
       onMouseUp={onStop}
       onMouseLeave={onStop}

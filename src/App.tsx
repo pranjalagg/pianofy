@@ -5,6 +5,7 @@ import { VoiceSelector } from './components/VoiceSelector';
 import { useAudio } from './hooks/useAudio';
 import { useKeyboard } from './hooks/useKeyboard';
 import { useTheme } from './hooks/useTheme';
+import { getVoiceById } from './utils/voices';
 import './App.css';
 
 function App() {
@@ -136,6 +137,8 @@ function App() {
       <PianoKeyboard
         octaveOffset={octaveOffset}
         activeNotes={activeNotes}
+        glowIntensity={getVoiceById(voiceId).glowIntensity}
+        hasActiveKeys={activeNotes.size > 0}
         onNoteOn={handleNoteOn}
         onNoteOff={handleNoteOff}
       />

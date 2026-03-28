@@ -5,8 +5,10 @@
   align-items: flex-end;
   justify-content: center;
   user-select: none;
-  transition: background 0.05s ease-out, transform 0.05s ease-out;
   -webkit-tap-highlight-color: transparent;
+  transition: background 0.05s ease,
+              transform 0.2s ease-in,
+              box-shadow 0.2s ease-in;
 }
 
 .piano-key__labels {
@@ -60,7 +62,11 @@
   background: var(--accent);
   border-color: var(--accent-border);
   color: #fff;
-  transform: translateY(2px);
+  transform: translateY(3px) scale(0.995);
+  box-shadow: 0 0 12px calc(4px * var(--glow-intensity, 0.7)) var(--glow-white);
+  transition: background 0.05s ease,
+              transform 0.08s ease-out,
+              box-shadow 0.08s ease-out;
 }
 
 .piano-key--white.piano-key--active .piano-key__note,
@@ -107,7 +113,11 @@
   background: var(--accent-dark);
   border-color: var(--accent-dark-border);
   color: #fff;
-  transform: translateY(1px);
+  transform: translateY(2px);
+  box-shadow: 0 0 10px calc(3px * var(--glow-intensity, 0.7)) var(--glow-black);
+  transition: background 0.05s ease,
+              transform 0.08s ease-out,
+              box-shadow 0.08s ease-out;
 }
 
 .piano-key--black.piano-key--active .piano-key__note,

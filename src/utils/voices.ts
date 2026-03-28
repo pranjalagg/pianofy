@@ -21,6 +21,7 @@ export interface OscillatorVoice {
   type: 'oscillator';
   oscillators: OscillatorConfig[];
   envelope: EnvelopeConfig;
+  glowIntensity: number;
 }
 
 export interface SampleVoice {
@@ -31,6 +32,7 @@ export interface SampleVoice {
   baseMidi: number;
   loop: boolean;
   envelope: EnvelopeConfig;
+  glowIntensity: number;
 }
 
 export type VoiceConfig = OscillatorVoice | SampleVoice;
@@ -45,6 +47,7 @@ export const VOICES: VoiceConfig[] = [
       { type: 'sine', ratio: 2, detune: 0, gain: 0.15 },
     ],
     envelope: { attack: 0.01, decay: 0.3, sustain: 0.3, release: 0.3 },
+    glowIntensity: 1.0,
   },
   {
     id: 'electric-piano',
@@ -56,6 +59,7 @@ export const VOICES: VoiceConfig[] = [
       { type: 'sine', ratio: 1, detune: -6, gain: 0.3 },
     ],
     envelope: { attack: 0.005, decay: 0.6, sustain: 0.4, release: 0.4 },
+    glowIntensity: 0.7,
   },
   {
     id: 'harmonium',
@@ -65,6 +69,7 @@ export const VOICES: VoiceConfig[] = [
     baseMidi: 48,
     loop: true,
     envelope: { attack: 0.02, decay: 0.1, sustain: 0.8, release: 0.15 },
+    glowIntensity: 0.4,
   },
   {
     id: 'synth-pad',
@@ -75,6 +80,7 @@ export const VOICES: VoiceConfig[] = [
       { type: 'sawtooth', ratio: 1, detune: 8, gain: 0.5 },
     ],
     envelope: { attack: 0.3, decay: 0.5, sustain: 0.6, release: 0.8 },
+    glowIntensity: 0.4,
   },
   {
     id: 'music-box',
@@ -84,6 +90,7 @@ export const VOICES: VoiceConfig[] = [
       { type: 'sine', ratio: 1, detune: 0, gain: 1.0 },
     ],
     envelope: { attack: 0.001, decay: 0.15, sustain: 0.05, release: 0.5 },
+    glowIntensity: 1.0,
   },
 ];
 

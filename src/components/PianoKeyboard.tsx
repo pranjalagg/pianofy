@@ -6,6 +6,8 @@ import './PianoKeyboard.css';
 interface PianoKeyboardProps {
   octaveOffset: number;
   activeNotes: Set<number>;
+  glowIntensity?: number;
+  hasActiveKeys?: boolean;
   onNoteOn: (midi: number) => void;
   onNoteOff: (midi: number) => void;
 }
@@ -34,6 +36,8 @@ function getBlackKeyLeft(semitoneInOctave: number, octaveIndex: number): number 
 export function PianoKeyboard({
   octaveOffset,
   activeNotes,
+  glowIntensity,
+  hasActiveKeys,
   onNoteOn,
   onNoteOff,
 }: PianoKeyboardProps) {
@@ -44,7 +48,10 @@ export function PianoKeyboard({
   const totalWidth = whiteKeys.length * WHITE_KEY_WIDTH;
 
   return (
-    <div className="piano-keyboard" style={{ width: totalWidth }}>
+    <div
+      className={`piano-keyboard${hasActiveKeys ? ' piano-keyboard--active' : ''}`}
+      style={{ width: totalWidth }}
+    >
       <div className="piano-keyboard__white-keys">
         {whiteKeys.map((key: PianoKeyData) => (
           <PianoKey
@@ -53,6 +60,7 @@ export function PianoKeyboard({
             isBlack={false}
             isActive={activeNotes.has(key.midiNumber)}
             keyboardKey={key.keyboardKey}
+            glowIntensity={glowIntensity}
             onPlay={() => onNoteOn(key.midiNumber)}
             onStop={() => onNoteOff(key.midiNumber)}
           />
@@ -73,6 +81,7 @@ export function PianoKeyboard({
               isActive={activeNotes.has(key.midiNumber)}
               keyboardKey={key.keyboardKey}
               style={{ left }}
+              glowIntensity={glowIntensity}
               onPlay={() => onNoteOn(key.midiNumber)}
               onStop={() => onNoteOff(key.midiNumber)}
             />
