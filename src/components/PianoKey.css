@@ -5,7 +5,7 @@
   align-items: flex-end;
   justify-content: center;
   user-select: none;
-  transition: background 0.05s ease;
+  transition: background 0.05s ease-out, transform 0.05s ease-out;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -50,14 +50,17 @@
   border-left: 1px solid var(--border-key);
 }
 
-.piano-key--white:hover {
-  background: var(--key-white-hover);
+@media (hover: hover) and (pointer: fine) {
+  .piano-key--white:hover {
+    background: var(--key-white-hover);
+  }
 }
 
 .piano-key--white.piano-key--active {
   background: var(--accent);
   border-color: var(--accent-border);
   color: #fff;
+  transform: translateY(2px);
 }
 
 .piano-key--white.piano-key--active .piano-key__note,
@@ -94,14 +97,17 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.piano-key--black:hover {
-  background: var(--key-black-hover);
+@media (hover: hover) and (pointer: fine) {
+  .piano-key--black:hover {
+    background: var(--key-black-hover);
+  }
 }
 
 .piano-key--black.piano-key--active {
   background: var(--accent-dark);
   border-color: var(--accent-dark-border);
   color: #fff;
+  transform: translateY(1px);
 }
 
 .piano-key--black.piano-key--active .piano-key__note,

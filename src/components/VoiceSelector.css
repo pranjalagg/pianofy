@@ -16,16 +16,22 @@
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background 0.12s ease-out, color 0.12s ease-out, transform 120ms ease-out;
 }
 
 .voice-selector__btn:last-child {
   border-right: none;
 }
 
-.voice-selector__btn:hover {
-  background: var(--surface);
-  color: var(--text-1);
+.voice-selector__btn:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .voice-selector__btn:hover {
+    background: var(--surface);
+    color: var(--text-1);
+  }
 }
 
 .voice-selector__btn--active {
@@ -33,7 +39,9 @@
   color: var(--bg);
 }
 
-.voice-selector__btn--active:hover {
-  background: var(--text-2);
-  color: var(--bg);
+@media (hover: hover) and (pointer: fine) {
+  .voice-selector__btn--active:hover {
+    background: var(--text-2);
+    color: var(--bg);
+  }
 }

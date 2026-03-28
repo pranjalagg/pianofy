@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+superpowers/
+AGENTS.md
+.agents/
+.cursor/
+skills-lock.json
