@@ -42,7 +42,7 @@
   border-right: 1px solid var(--border-key);
   border-bottom: 1px solid var(--border-key);
   border-radius: 0 0 5px 5px;
-  color: var(--text-2);
+  color: var(--key-white-text);
   z-index: 1;
 }
 
@@ -85,12 +85,12 @@
 
 .piano-key--black .piano-key__note {
   font-size: 10px;
-  color: #bbb;
+  color: var(--key-black-note);
 }
 
 .piano-key--black .piano-key__shortcut {
   font-size: 9px;
-  color: #999;
+  color: var(--key-black-shortcut);
   background: rgba(255, 255, 255, 0.1);
 }
 

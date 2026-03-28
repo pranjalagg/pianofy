@@ -24,6 +24,9 @@
   --key-black: #1c1c1c;
   --key-black-hover: #2a2a2a;
   --key-black-border: #111;
+  --key-black-note: #bbb;
+  --key-black-shortcut: #999;
+  --key-white-text: #000;
   --rail: #3a3632;
   --shadow: rgba(0, 0, 0, 0.08);
   --shadow-key: rgba(0, 0, 0, 0.15);
@@ -47,6 +50,9 @@
   --key-black: #1a1a1a;
   --key-black-hover: #252525;
   --key-black-border: #0e0e0e;
+  --key-black-note: #ccc;
+  --key-black-shortcut: #aaa;
+  --key-white-text: #333;
   --rail: #444;
   --shadow: rgba(0, 0, 0, 0.3);
   --shadow-key: rgba(0, 0, 0, 0.4);
