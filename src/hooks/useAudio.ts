@@ -3,16 +3,26 @@ import { midiToFrequency } from '../utils/noteMapping';
 import { getVoiceById } from '../utils/voices';
 import type { VoiceConfig } from '../utils/voices';
 
-interface ActiveNote {
+interface ActiveOscNote {
+  kind: 'oscillator';
   oscillators: OscillatorNode[];
   gainNode: GainNode;
 }
+
+interface ActiveSampleNote {
+  kind: 'sample';
+  source: AudioBufferSourceNode;
+  gainNode: GainNode;
+}
+
+type ActiveNote = ActiveOscNote | ActiveSampleNote;
 
 export function useAudio() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const activeNotesRef = useRef<Map<number, ActiveNote>>(new Map());
   const voiceRef = useRef<VoiceConfig>(getVoiceById('grand-piano'));
+  const bufferCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
 
   const ensureContext = useCallback(() => {
     if (!audioContextRef.current) {
@@ -30,11 +40,27 @@ export function useAudio() {
     };
   }, []);
 
+  const loadSample = useCallback(async (url: string): Promise<AudioBuffer | null> => {
+    const cached = bufferCacheRef.current.get(url);
+    if (cached) return cached;
+
+    const { ctx } = ensureContext();
+    try {
+      const fullUrl = import.meta.env.BASE_URL + url.replace(/^\//, '');
+      const response = await fetch(fullUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      bufferCacheRef.current.set(url, audioBuffer);
+      return audioBuffer;
+    } catch {
+      return null;
+    }
+  }, [ensureContext]);
+
   const playNote = useCallback((midi: number) => {
     if (activeNotesRef.current.has(midi)) return;
 
     const { ctx, masterGain } = ensureContext();
-    const frequency = midiToFrequency(midi);
     const now = ctx.currentTime;
     const voice = voiceRef.current;
     const { envelope } = voice;
@@ -46,33 +72,47 @@ export function useAudio() {
       Math.max(envelope.sustain * 0.6, 0.001),
       now + envelope.attack + envelope.decay,
     );
-
-    const oscillators: OscillatorNode[] = [];
-
-    for (const oscConfig of voice.oscillators) {
-      const osc = ctx.createOscillator();
-      osc.type = oscConfig.type;
-      osc.frequency.setValueAtTime(frequency * oscConfig.ratio, now);
-      if (oscConfig.detune !== 0) {
-        osc.detune.setValueAtTime(oscConfig.detune, now);
-      }
-
-      if (oscConfig.gain < 1) {
-        const oscGain = ctx.createGain();
-        oscGain.gain.setValueAtTime(oscConfig.gain, now);
-        osc.connect(oscGain);
-        oscGain.connect(gainNode);
-      } else {
-        osc.connect(gainNode);
-      }
-
-      osc.start(now);
-      oscillators.push(osc);
-    }
-
     gainNode.connect(masterGain);
 
-    activeNotesRef.current.set(midi, { oscillators, gainNode });
+    if (voice.type === 'sample') {
+      const buffer = bufferCacheRef.current.get(voice.sampleUrl);
+      if (!buffer) return;
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.playbackRate.value = Math.pow(2, (midi - voice.baseMidi) / 12);
+      source.loop = voice.loop;
+      source.connect(gainNode);
+      source.start(now);
+
+      activeNotesRef.current.set(midi, { kind: 'sample', source, gainNode });
+    } else {
+      const frequency = midiToFrequency(midi);
+      const oscillators: OscillatorNode[] = [];
+
+      for (const oscConfig of voice.oscillators) {
+        const osc = ctx.createOscillator();
+        osc.type = oscConfig.type;
+        osc.frequency.setValueAtTime(frequency * oscConfig.ratio, now);
+        if (oscConfig.detune !== 0) {
+          osc.detune.setValueAtTime(oscConfig.detune, now);
+        }
+
+        if (oscConfig.gain < 1) {
+          const oscGain = ctx.createGain();
+          oscGain.gain.setValueAtTime(oscConfig.gain, now);
+          osc.connect(oscGain);
+          oscGain.connect(gainNode);
+        } else {
+          osc.connect(gainNode);
+        }
+
+        osc.start(now);
+        oscillators.push(osc);
+      }
+
+      activeNotesRef.current.set(midi, { kind: 'oscillator', oscillators, gainNode });
+    }
   }, [ensureContext]);
 
   const stopNote = useCallback((midi: number) => {
@@ -82,15 +122,19 @@ export function useAudio() {
     const ctx = audioContextRef.current!;
     const now = ctx.currentTime;
     const release = voiceRef.current.envelope.release;
-    const { oscillators, gainNode } = active;
 
-    gainNode.gain.cancelScheduledValues(now);
-    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + release);
+    active.gainNode.gain.cancelScheduledValues(now);
+    active.gainNode.gain.setValueAtTime(active.gainNode.gain.value, now);
+    active.gainNode.gain.exponentialRampToValueAtTime(0.001, now + release);
 
     const stopTime = now + release + 0.05;
-    for (const osc of oscillators) {
-      osc.stop(stopTime);
+
+    if (active.kind === 'oscillator') {
+      for (const osc of active.oscillators) {
+        osc.stop(stopTime);
+      }
+    } else {
+      active.source.stop(stopTime);
     }
 
     activeNotesRef.current.delete(midi);
@@ -103,8 +147,12 @@ export function useAudio() {
   }, []);
 
   const setVoice = useCallback((voiceId: string) => {
-    voiceRef.current = getVoiceById(voiceId);
-  }, []);
+    const voice = getVoiceById(voiceId);
+    voiceRef.current = voice;
+    if (voice.type === 'sample') {
+      loadSample(voice.sampleUrl);
+    }
+  }, [loadSample]);
 
   return { playNote, stopNote, setVolume, setVoice };
 }

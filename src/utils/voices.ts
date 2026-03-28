@@ -15,17 +15,31 @@ export interface EnvelopeConfig {
   release: number;
 }
 
-export interface VoiceConfig {
+export interface OscillatorVoice {
   id: string;
   name: string;
+  type: 'oscillator';
   oscillators: OscillatorConfig[];
   envelope: EnvelopeConfig;
 }
+
+export interface SampleVoice {
+  id: string;
+  name: string;
+  type: 'sample';
+  sampleUrl: string;
+  baseMidi: number;
+  loop: boolean;
+  envelope: EnvelopeConfig;
+}
+
+export type VoiceConfig = OscillatorVoice | SampleVoice;
 
 export const VOICES: VoiceConfig[] = [
   {
     id: 'grand-piano',
     name: 'Grand Piano',
+    type: 'oscillator',
     oscillators: [
       { type: 'triangle', ratio: 1, detune: 0, gain: 1.0 },
       { type: 'sine', ratio: 2, detune: 0, gain: 0.15 },
@@ -35,6 +49,7 @@ export const VOICES: VoiceConfig[] = [
   {
     id: 'electric-piano',
     name: 'Electric Piano',
+    type: 'oscillator',
     oscillators: [
       { type: 'sine', ratio: 1, detune: 0, gain: 1.0 },
       { type: 'sine', ratio: 3, detune: 7, gain: 0.25 },
@@ -45,16 +60,16 @@ export const VOICES: VoiceConfig[] = [
   {
     id: 'harmonium',
     name: 'Harmonium',
-    oscillators: [
-      { type: 'sawtooth', ratio: 1, detune: 0, gain: 0.5 },
-      { type: 'square', ratio: 1, detune: 5, gain: 0.3 },
-      { type: 'sawtooth', ratio: 2, detune: 0, gain: 0.1 },
-    ],
+    type: 'sample',
+    sampleUrl: '/samples/harmonium.wav',
+    baseMidi: 48,
+    loop: true,
     envelope: { attack: 0.02, decay: 0.1, sustain: 0.8, release: 0.15 },
   },
   {
     id: 'synth-pad',
     name: 'Synth Pad',
+    type: 'oscillator',
     oscillators: [
       { type: 'sawtooth', ratio: 1, detune: -8, gain: 0.5 },
       { type: 'sawtooth', ratio: 1, detune: 8, gain: 0.5 },
@@ -64,6 +79,7 @@ export const VOICES: VoiceConfig[] = [
   {
     id: 'music-box',
     name: 'Music Box',
+    type: 'oscillator',
     oscillators: [
       { type: 'sine', ratio: 1, detune: 0, gain: 1.0 },
     ],
