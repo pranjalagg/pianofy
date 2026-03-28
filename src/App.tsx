@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef } from 'react';
+import { ChordBar } from './components/ChordBar';
 import { PianoKeyboard } from './components/PianoKeyboard';
 import { PianoControls } from './components/PianoControls';
 import { VoiceSelector } from './components/VoiceSelector';
 import { useAudio } from './hooks/useAudio';
+import { useChords } from './hooks/useChords';
 import { useKeyboard } from './hooks/useKeyboard';
 import { useTheme } from './hooks/useTheme';
 import { getVoiceById } from './utils/voices';
@@ -18,6 +20,12 @@ function App() {
   const [chorusOn, setChorusOn] = useState(true);
   const [delayOn, setDelayOn] = useState(false);
   const { playNote, stopNote, setVolume: setAudioVolume, setVoice, setReverb: setAudioReverb, setChorus: setAudioChorus, setDelay: setAudioDelay } = useAudio();
+  const { activeChord, toggleChord } = useChords({
+    transpose,
+    octaveOffset,
+    playNote,
+    stopNote,
+  });
   const { theme, toggleTheme } = useTheme();
 
   const transposedMapRef = useRef<Map<number, number>>(new Map());
@@ -101,6 +109,7 @@ function App() {
     onNoteOn: handleNoteOn,
     onNoteOff: handleNoteOff,
     onOctaveChange: handleOctaveChange,
+    onChordToggle: toggleChord,
   });
 
   return (
@@ -134,6 +143,12 @@ function App() {
         onDelayToggle={handleDelayToggle}
       />
 
+      <ChordBar
+        transpose={transpose}
+        activeChord={activeChord}
+        onChordToggle={toggleChord}
+      />
+
       <PianoKeyboard
         octaveOffset={octaveOffset}
         activeNotes={activeNotes}
@@ -150,6 +165,7 @@ function App() {
           <span><kbd>A</kbd>–<kbd>'</kbd> white keys</span>
           <span><kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> black keys</span>
           <span><kbd>←</kbd> <kbd>→</kbd> octave</span>
+          <span><kbd>1</kbd>–<kbd>7</kbd> chords</span>
         </div>
       </footer>
     </div>

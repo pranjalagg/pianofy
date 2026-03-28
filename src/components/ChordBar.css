@@ -1,0 +1,56 @@
+.chord-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chord-bar__label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-5);
+  white-space: nowrap;
+}
+
+.chord-bar__buttons {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chord-bar__btn {
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-3);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.12s ease, color 0.12s ease;
+  min-width: 44px;
+  text-align: center;
+}
+
+.chord-bar__btn:last-child {
+  border-right: none;
+}
+
+.chord-bar__btn:hover {
+  background: var(--surface);
+  color: var(--text-1);
+}
+
+.chord-bar__btn--active {
+  background: var(--text-1);
+  color: var(--bg);
+}
+
+.chord-bar__btn--active:hover {
+  background: var(--text-2);
+  color: var(--bg);
+}

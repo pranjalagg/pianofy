@@ -6,6 +6,7 @@ interface UseKeyboardOptions {
   onNoteOn: (midi: number) => void;
   onNoteOff: (midi: number) => void;
   onOctaveChange: (delta: number) => void;
+  onChordToggle?: (degree: number) => void;
 }
 
 export function useKeyboard({
@@ -13,6 +14,7 @@ export function useKeyboard({
   onNoteOn,
   onNoteOff,
   onOctaveChange,
+  onChordToggle,
 }: UseKeyboardOptions) {
   // Track which keyboard keys are currently held to map them to the correct MIDI
   // note even if octave changes while a key is held
@@ -32,6 +34,12 @@ export function useKeyboard({
         return;
       }
 
+      const chordDegree = parseInt(key, 10);
+      if (chordDegree >= 1 && chordDegree <= 7 && onChordToggle) {
+        onChordToggle(chordDegree - 1);
+        return;
+      }
+
       if (key in KEY_TO_SEMITONE && !heldKeysRef.current.has(key)) {
         const midi = keyToMidi(key, octaveOffset);
         if (midi !== null) {
@@ -40,7 +48,7 @@ export function useKeyboard({
         }
       }
     },
-    [octaveOffset, onNoteOn, onOctaveChange],
+    [octaveOffset, onNoteOn, onOctaveChange, onChordToggle],
   );
 
   const handleKeyUp = useCallback(
