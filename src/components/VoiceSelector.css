@@ -1,0 +1,39 @@
+.voice-selector {
+  display: flex;
+  gap: 0;
+  border: 1px solid #ddd9d1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.voice-selector__btn {
+  background: transparent;
+  border: none;
+  border-right: 1px solid #ddd9d1;
+  color: #888;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.voice-selector__btn:last-child {
+  border-right: none;
+}
+
+.voice-selector__btn:hover {
+  background: #f0eee9;
+  color: #1a1a1a;
+}
+
+.voice-selector__btn--active {
+  background: #1a1a1a;
+  color: #faf9f6;
+}
+
+.voice-selector__btn--active:hover {
+  background: #333;
+  color: #faf9f6;
+}

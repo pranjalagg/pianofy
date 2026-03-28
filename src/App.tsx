@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { PianoKeyboard } from './components/PianoKeyboard';
 import { PianoControls } from './components/PianoControls';
+import { VoiceSelector } from './components/VoiceSelector';
 import { useAudio } from './hooks/useAudio';
 import { useKeyboard } from './hooks/useKeyboard';
 import './App.css';
@@ -13,8 +14,6 @@ function App() {
   const [voiceId, setVoiceId] = useState('grand-piano');
   const { playNote, stopNote, setVolume: setAudioVolume, setVoice } = useAudio();
 
-  // Track which transposed MIDI is playing for each original MIDI so we can
-  // stop the correct note even if transpose changes while a key is held
   const transposedMapRef = useRef<Map<number, number>>(new Map());
 
   const handleNoteOn = useCallback(
@@ -77,7 +76,7 @@ function App() {
   return (
     <div className="app">
       <header className="app__header">
-        <h1 className="app__title">Pianofy</h1>
+        <h1 className="app__title">pianofy</h1>
         <p className="app__subtitle">Play with your keyboard</p>
       </header>
 
@@ -85,11 +84,9 @@ function App() {
         octaveOffset={octaveOffset}
         volume={volume}
         transpose={transpose}
-        voiceId={voiceId}
         onOctaveChange={handleOctaveChange}
         onVolumeChange={handleVolumeChange}
         onTransposeChange={handleTransposeChange}
-        onVoiceChange={handleVoiceChange}
       />
 
       <PianoKeyboard
@@ -99,10 +96,13 @@ function App() {
         onNoteOff={handleNoteOff}
       />
 
+      <VoiceSelector voiceId={voiceId} onVoiceChange={handleVoiceChange} />
+
       <footer className="app__footer">
         <div className="app__hints">
-          <span><kbd>A</kbd>–<kbd>'</kbd> play white keys &middot; <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> play black keys</span>
-          <span><kbd>←</kbd> <kbd>→</kbd> shift octave</span>
+          <span><kbd>A</kbd>–<kbd>'</kbd> white keys</span>
+          <span><kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> black keys</span>
+          <span><kbd>←</kbd> <kbd>→</kbd> octave</span>
         </div>
       </footer>
     </div>

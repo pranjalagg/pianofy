@@ -1,9 +1,11 @@
 .piano-keyboard {
   position: relative;
   display: inline-block;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 8px 8px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #d4d1cc;
+  border-top: 4px solid #3a3632;
 }
 
 .piano-keyboard__white-keys {
