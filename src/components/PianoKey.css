@@ -19,16 +19,19 @@
 }
 
 .piano-key__note {
-  font-size: 10px;
-  font-weight: 500;
-  opacity: 0.45;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.7;
 }
 
 .piano-key__shortcut {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
-  opacity: 0.3;
+  opacity: 0.5;
+  background: rgba(128, 128, 128, 0.12);
+  border-radius: 3px;
+  padding: 1px 5px;
 }
 
 /* White keys */
@@ -59,7 +62,7 @@
 
 .piano-key--white.piano-key--active .piano-key__note,
 .piano-key--white.piano-key--active .piano-key__shortcut {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 /* Black keys */
@@ -81,13 +84,14 @@
 }
 
 .piano-key--black .piano-key__note {
-  font-size: 9px;
-  color: #888;
+  font-size: 10px;
+  color: #bbb;
 }
 
 .piano-key--black .piano-key__shortcut {
-  font-size: 8px;
-  color: #666;
+  font-size: 9px;
+  color: #999;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .piano-key--black:hover {
@@ -102,6 +106,6 @@
 
 .piano-key--black.piano-key--active .piano-key__note,
 .piano-key--black.piano-key--active .piano-key__shortcut {
-  opacity: 0.85;
+  opacity: 1;
   color: #fff;
 }
