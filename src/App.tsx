@@ -8,6 +8,9 @@ import { useChords } from './hooks/useChords';
 import { useKeyboard } from './hooks/useKeyboard';
 import { useTheme } from './hooks/useTheme';
 import { getVoiceById } from './utils/voices';
+import { DEFAULT_QUALITIES } from './utils/chords';
+import type { ChordMode } from './hooks/useChords';
+import type { ChordQuality } from './utils/chords';
 import './App.css';
 
 function App() {
@@ -19,10 +22,14 @@ function App() {
   const [reverb, setReverb] = useState(0.3);
   const [chorusOn, setChorusOn] = useState(true);
   const [delayOn, setDelayOn] = useState(false);
+  const [chordMode, setChordMode] = useState<ChordMode>('arpeggio');
+  const [chordQualities, setChordQualities] = useState<ChordQuality[]>([...DEFAULT_QUALITIES]);
   const { playNote, stopNote, setVolume: setAudioVolume, setVoice, setReverb: setAudioReverb, setChorus: setAudioChorus, setDelay: setAudioDelay } = useAudio();
   const { activeChord, toggleChord } = useChords({
     transpose,
     octaveOffset,
+    qualities: chordQualities,
+    mode: chordMode,
     playNote,
     stopNote,
   });
@@ -96,6 +103,14 @@ function App() {
     });
   }, [setAudioDelay]);
 
+  const handleQualityChange = useCallback((degree: number, quality: ChordQuality) => {
+    setChordQualities((prev) => {
+      const next = [...prev];
+      next[degree] = quality;
+      return next;
+    });
+  }, []);
+
   const handleVoiceChange = useCallback(
     (id: string) => {
       setVoiceId(id);
@@ -146,7 +161,11 @@ function App() {
       <ChordBar
         transpose={transpose}
         activeChord={activeChord}
+        mode={chordMode}
+        qualities={chordQualities}
         onChordToggle={toggleChord}
+        onModeChange={setChordMode}
+        onQualityChange={handleQualityChange}
       />
 
       <PianoKeyboard

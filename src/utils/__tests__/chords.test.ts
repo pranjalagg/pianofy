@@ -1,9 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import {
   getChordMidiNotes,
+  getChordMidiNotesWithQuality,
   getChordName,
+  getChordNameWithQuality,
   getDiatonicChordNames,
+  getChordNamesWithQualities,
+  cycleQuality,
   ARPEGGIO_PATTERN,
+  DEFAULT_QUALITIES,
 } from '../chords';
 
 describe('getChordMidiNotes', () => {
@@ -105,5 +110,67 @@ describe('getDiatonicChordNames', () => {
 describe('ARPEGGIO_PATTERN', () => {
   it('is an array of 4 indices cycling through chord tones', () => {
     expect(ARPEGGIO_PATTERN).toEqual([0, 1, 2, 0]);
+  });
+});
+
+describe('getChordMidiNotesWithQuality', () => {
+  it('returns C major triad with quality override', () => {
+    expect(getChordMidiNotesWithQuality(0, 0, 36, 'major')).toEqual([36, 40, 43]);
+  });
+
+  it('returns C minor triad with quality override', () => {
+    expect(getChordMidiNotesWithQuality(0, 0, 36, 'minor')).toEqual([36, 39, 43]);
+  });
+
+  it('returns C diminished triad with quality override', () => {
+    expect(getChordMidiNotesWithQuality(0, 0, 36, 'dim')).toEqual([36, 39, 42]);
+  });
+
+  it('works with transpose and custom quality', () => {
+    expect(getChordMidiNotesWithQuality(1, 2, 36, 'major')).toEqual([40, 44, 47]);
+  });
+});
+
+describe('getChordNameWithQuality', () => {
+  it('returns "C" for degree 0 major', () => {
+    expect(getChordNameWithQuality(0, 0, 'major')).toBe('C');
+  });
+
+  it('returns "Cm" for degree 0 minor', () => {
+    expect(getChordNameWithQuality(0, 0, 'minor')).toBe('Cm');
+  });
+
+  it('returns "C°" for degree 0 dim', () => {
+    expect(getChordNameWithQuality(0, 0, 'dim')).toBe('C°');
+  });
+
+  it('returns "D" for degree 1 with transpose 0 and major override', () => {
+    expect(getChordNameWithQuality(1, 0, 'major')).toBe('D');
+  });
+});
+
+describe('getChordNamesWithQualities', () => {
+  it('returns names matching custom qualities', () => {
+    const qualities = ['major', 'major', 'minor', 'major', 'minor', 'dim', 'major'] as const;
+    const names = getChordNamesWithQualities(0, [...qualities]);
+    expect(names).toEqual(['C', 'D', 'Em', 'F', 'Gm', 'A°', 'B']);
+  });
+});
+
+describe('cycleQuality', () => {
+  it('cycles major → minor', () => {
+    expect(cycleQuality('major')).toBe('minor');
+  });
+  it('cycles minor → dim', () => {
+    expect(cycleQuality('minor')).toBe('dim');
+  });
+  it('cycles dim → major', () => {
+    expect(cycleQuality('dim')).toBe('major');
+  });
+});
+
+describe('DEFAULT_QUALITIES', () => {
+  it('has 7 diatonic defaults', () => {
+    expect(DEFAULT_QUALITIES).toEqual(['major', 'minor', 'minor', 'major', 'major', 'minor', 'dim']);
   });
 });

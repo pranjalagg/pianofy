@@ -54,3 +54,44 @@
   background: var(--text-2);
   color: var(--bg);
 }
+
+.chord-bar__mode {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-left: 4px;
+}
+
+.chord-bar__mode-btn {
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-3);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.chord-bar__mode-btn:last-child {
+  border-right: none;
+}
+
+.chord-bar__mode-btn:hover {
+  background: var(--surface);
+  color: var(--text-1);
+}
+
+.chord-bar__mode-btn--active {
+  background: var(--text-1);
+  color: var(--bg);
+}
+
+.chord-bar__mode-btn--active:hover {
+  background: var(--text-2);
+  color: var(--bg);
+}
