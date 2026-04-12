@@ -87,9 +87,9 @@ export function useAudio() {
       chorusLFORef.current = chorusLFO;
 
       const delayNode = ctx.createDelay();
-      delayNode.delayTime.value = 0.15;
+      delayNode.delayTime.value = 0.35;
       const delayFeedback = ctx.createGain();
-      delayFeedback.gain.value = 0.2;
+      delayFeedback.gain.value = 0.35;
       const delayWet = ctx.createGain();
       delayWet.gain.value = 0;
       effectsBusRef.current.connect(delayNode);
@@ -276,7 +276,7 @@ export function useAudio() {
 
   const setDelay = useCallback((enabled: boolean) => {
     if (delayWetRef.current) {
-      delayWetRef.current.gain.value = enabled ? 0.15 : 0;
+      delayWetRef.current.gain.value = enabled ? 0.4 : 0;
     }
   }, []);
 
