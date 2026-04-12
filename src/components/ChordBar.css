@@ -26,7 +26,7 @@
   border: none;
   border-right: 1px solid var(--border);
   color: var(--text-3);
-  padding: 8px 16px;
+  padding: 6px 16px 8px;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
@@ -34,6 +34,26 @@
   transition: background 0.12s ease, color 0.12s ease;
   min-width: 44px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.chord-bar__btn-key {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.45;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.chord-bar__btn--active .chord-bar__btn-key {
+  opacity: 0.6;
+}
+
+.chord-bar__btn-name {
+  line-height: 1;
 }
 
 .chord-bar__btn:last-child {

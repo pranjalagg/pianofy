@@ -26,7 +26,7 @@ export function ChordBar({
 
   return (
     <div className="chord-bar">
-      <span className="chord-bar__label">Chords (1-7)</span>
+      <span className="chord-bar__label">Chords</span>
       <div className="chord-bar__buttons">
         {chordNames.map((name, i) => (
           <button
@@ -42,7 +42,8 @@ export function ChordBar({
             }}
             title="Click to play, right-click to change quality"
           >
-            {name}
+            <span className="chord-bar__btn-key">{i + 1}</span>
+            <span className="chord-bar__btn-name">{name}</span>
           </button>
         ))}
       </div>
