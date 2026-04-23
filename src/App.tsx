@@ -3,6 +3,7 @@ import { ChordBar } from './components/ChordBar';
 import { PianoKeyboard } from './components/PianoKeyboard';
 import { PianoControls } from './components/PianoControls';
 import { VoiceSelector } from './components/VoiceSelector';
+import { VisualizerCanvas } from './components/VisualizerCanvas';
 import { useAudio } from './hooks/useAudio';
 import { useChords } from './hooks/useChords';
 import { useKeyboard } from './hooks/useKeyboard';
@@ -11,6 +12,7 @@ import { getVoiceById } from './utils/voices';
 import { DEFAULT_QUALITIES } from './utils/chords';
 import type { ChordMode } from './hooks/useChords';
 import type { ChordQuality } from './utils/chords';
+import type { VisualMode } from './utils/visualModes';
 import './App.css';
 
 function App() {
@@ -24,7 +26,9 @@ function App() {
   const [delayOn, setDelayOn] = useState(false);
   const [chordMode, setChordMode] = useState<ChordMode>('arpeggio');
   const [chordQualities, setChordQualities] = useState<ChordQuality[]>([...DEFAULT_QUALITIES]);
-  const { playNote, stopNote, setVolume: setAudioVolume, setVoice, setReverb: setAudioReverb, setChorus: setAudioChorus, setDelay: setAudioDelay } = useAudio();
+  const [visualMode, setVisualMode] = useState<VisualMode>('particles');
+  const [visualIntensity, setVisualIntensity] = useState(0.7);
+  const { playNote, stopNote, setVolume: setAudioVolume, setVoice, setReverb: setAudioReverb, setChorus: setAudioChorus, setDelay: setAudioDelay, getAnalyser } = useAudio();
   const { activeChord, toggleChord } = useChords({
     transpose,
     octaveOffset,
@@ -129,6 +133,13 @@ function App() {
 
   return (
     <div className="app">
+      <VisualizerCanvas
+        getAnalyser={getAnalyser}
+        activeNotes={activeNotes}
+        mode={visualMode}
+        intensity={visualIntensity}
+      />
+
       <header className="app__header">
         <div className="app__title-row">
           <h1 className="app__title">pianofy</h1>
@@ -150,12 +161,16 @@ function App() {
         reverb={reverb}
         chorusOn={chorusOn}
         delayOn={delayOn}
+        visualMode={visualMode}
+        visualIntensity={visualIntensity}
         onOctaveChange={handleOctaveChange}
         onVolumeChange={handleVolumeChange}
         onTransposeChange={handleTransposeChange}
         onReverbChange={handleReverbChange}
         onChorusToggle={handleChorusToggle}
         onDelayToggle={handleDelayToggle}
+        onVisualModeChange={setVisualMode}
+        onVisualIntensityChange={setVisualIntensity}
       />
 
       <ChordBar

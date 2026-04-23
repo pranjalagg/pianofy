@@ -44,15 +44,22 @@ export function useAudio() {
   const delayNodeRef = useRef<DelayNode | null>(null);
   const delayWetRef = useRef<GainNode | null>(null);
   const delayFeedbackRef = useRef<GainNode | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
 
   const ensureContext = useCallback(() => {
     if (!audioContextRef.current) {
       const ctx = new AudioContext();
       audioContextRef.current = ctx;
 
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+      analyserRef.current = analyser;
+
       masterGainRef.current = ctx.createGain();
       masterGainRef.current.gain.value = 0.5;
-      masterGainRef.current.connect(ctx.destination);
+      masterGainRef.current.connect(analyser);
+      analyser.connect(ctx.destination);
 
       const masterGain = masterGainRef.current;
 
@@ -280,5 +287,9 @@ export function useAudio() {
     }
   }, []);
 
-  return { playNote, stopNote, setVolume, setVoice, setReverb, setChorus, setDelay };
+  const getAnalyser = useCallback((): AnalyserNode | null => {
+    return analyserRef.current;
+  }, []);
+
+  return { playNote, stopNote, setVolume, setVoice, setReverb, setChorus, setDelay, getAnalyser };
 }

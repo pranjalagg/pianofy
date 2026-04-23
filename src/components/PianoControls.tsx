@@ -1,3 +1,4 @@
+import { VISUAL_MODES, type VisualMode } from '../utils/visualModes';
 import './PianoControls.css';
 
 interface PianoControlsProps {
@@ -7,12 +8,16 @@ interface PianoControlsProps {
   reverb: number;
   chorusOn: boolean;
   delayOn: boolean;
+  visualMode: VisualMode;
+  visualIntensity: number;
   onOctaveChange: (delta: number) => void;
   onVolumeChange: (volume: number) => void;
   onTransposeChange: (value: number) => void;
   onReverbChange: (amount: number) => void;
   onChorusToggle: () => void;
   onDelayToggle: () => void;
+  onVisualModeChange: (mode: VisualMode) => void;
+  onVisualIntensityChange: (intensity: number) => void;
 }
 
 const SEMITONE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -34,12 +39,16 @@ export function PianoControls({
   reverb,
   chorusOn,
   delayOn,
+  visualMode,
+  visualIntensity,
   onOctaveChange,
   onVolumeChange,
   onTransposeChange,
   onReverbChange,
   onChorusToggle,
   onDelayToggle,
+  onVisualModeChange,
+  onVisualIntensityChange,
 }: PianoControlsProps) {
   const currentOctave = 4 + octaveOffset;
 
@@ -142,6 +151,41 @@ export function PianoControls({
           </button>
         </div>
       </div>
+
+      <div className="piano-controls__sep" />
+
+      <div className="piano-controls__group">
+        <span className="piano-controls__label">Visuals</span>
+        <div className="piano-controls__toggles">
+          {VISUAL_MODES.map((vm) => (
+            <button
+              key={vm.id}
+              className={`piano-controls__toggle ${visualMode === vm.id ? 'piano-controls__toggle--active' : ''}`}
+              onClick={() => onVisualModeChange(vm.id)}
+            >
+              {vm.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {visualMode !== 'off' && (
+        <>
+          <div className="piano-controls__sep" />
+          <div className="piano-controls__group">
+            <span className="piano-controls__label">Intensity</span>
+            <input
+              type="range"
+              className="piano-controls__slider"
+              min="0.1"
+              max="1"
+              step="0.05"
+              value={visualIntensity}
+              onChange={(e) => onVisualIntensityChange(parseFloat(e.target.value))}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
